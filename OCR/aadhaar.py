@@ -2,6 +2,7 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from dotenv import load_dotenv
+from typing import Dict
 import base64
 
 #Importing the Output Structure Class
@@ -20,7 +21,10 @@ class AadhaarExtractor:
         self.user_aadhaar_image_front = user_aadhaar_image_front
         self.user_aadhaar_image_back = user_aadhaar_image_back
 
-    def read_aadhaar(self)->None:
+    def read_aadhaar(self)->dict:
+        '''
+        Function to read and extract the extract output of the aadhaar card and return the JSON
+        '''
         if self.user_aadhaar_image_front and self.user_aadhaar_image_back:
             # Encode both images
             front_image = base64.b64encode(self.user_aadhaar_image_front.read()).decode("utf-8")

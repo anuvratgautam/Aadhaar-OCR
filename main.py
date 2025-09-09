@@ -1,4 +1,4 @@
-from OCR import AadhaarExtractor
+from OCR import AadhaarExtractor,MembershipFormExtractor
 from fastapi import FastAPI, Form, File, UploadFile, HTTPException
 from typing import Annotated
 
@@ -21,4 +21,16 @@ async def extract_aadhaar(phone:Annotated[int,Form(..., description='Enter Your 
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"An error occurred: {e}")
 
+@app.post('/member-form')
+async def extract_membership_form(form_image: Annotated[UploadFile, File(...,description='Form Image')]):
+    '''
+    This functions prompts the user for the form image , forms a Membership_Form object 
+    and extracts the user information
+    '''
+    try: 
+        form_extractor = MembershipFormExtractor(form_image.file)
+        result =  form_extractor.read_form()
 
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=f'An Error Occured: {e}')
