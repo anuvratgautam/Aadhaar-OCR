@@ -46,6 +46,7 @@ class Membership_Form(BaseModel):
         # Payment details
         amount_paid: Optional[Annotated[float, Field(description="Membership amount paid in numbers")]] = None
         amount_in_words: Optional[Annotated[str, Field(description="Membership amount in words")]] = None
+        transaction_number: Optional[Annotated[str, Field(description="Transaction Number in words")]] = None
 
         # Introducer details
         introducer_name: Optional[Annotated[str, Field(description="Name of the introducer")]] = None

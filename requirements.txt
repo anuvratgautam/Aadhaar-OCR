@@ -5,3 +5,6 @@ langchain
 langchain-openai
 pydantic
 python-multipart
+pillow
+opencv-python
+numpy

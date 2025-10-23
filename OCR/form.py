@@ -1,33 +1,42 @@
-#Module imports
-from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from dotenv import load_dotenv
-import base64
-
+from typing import Dict
+import os
 from .details import Membership_Form
+from ImageProcessing.processor import ImageProcessor
 
 load_dotenv()
 
 class MembershipFormExtractor:
 
-    def __init__(self,form) -> None:
-        self.form = form 
-        self.model =  ChatOpenAI(model='gpt-5')
+    def __init__(self, form) -> None:
+        self.form = form
+        self.model = AzureChatOpenAI(
+            deployment_name='gpt-5-mini',  # Use your actual deployment name
+            api_version="2024-08-01-preview",
+            azure_endpoint=os.getenv("OPENAI_API_BASE"),
+            api_key=os.getenv("OPENAI_API_KEY")
+        )
         self.structured_model = self.model.with_structured_output(Membership_Form)
 
-    def read_form(self)-> dict:
+    def read_form(self) -> Dict:
         '''
         Function to read and extract the extract output of the Form and return the JSON
         '''
         if self.form:
-            form_image =  base64.b64encode(self.form.read()).decode("utf-8")
+            # Preprocess the form image for better OCR accuracy
+            form_processed_bytes = ImageProcessor.preprocess_form_image(self.form)
+            
+            # Encode to base64
+            form_image = ImageProcessor.encode_to_base64(form_processed_bytes)
 
         message = [
                 SystemMessage(
                     content=(
                         """
                             You are an information extraction assistant.  
-                        You will be given OCR text (or an image-to-text output) of a "Membership Form".
+                        You will be given an image of a "Membership Form" that has been preprocessed for optimal OCR.
 
                         Your task:  
                         - Extract only the fields that have been filled in the form.  
@@ -37,7 +46,7 @@ class MembershipFormExtractor:
                         - Numbers (age, amount_paid) should be integers/floats, not strings.  
                         - For signatures: return True if a signature is present, False if absent.  
                         - Do not add extra keys or explanations — only return the JSON object.  
-                        
+                        - Pay special attention to handwritten entries as they may appear bolder due to preprocessing.
 
                         Schema fields to capture:  
                         - applicant_name  
@@ -71,15 +80,11 @@ class MembershipFormExtractor:
                 ),
                 HumanMessage(
                     content=[
-                        {"type": "text", "text": "Extract the filled details from this membership form."},
+                        {"type": "text", "text": "Extract the filled details from this preprocessed membership form."},
                         {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{form_image}"}}
                     ]
                 )
             ]  
 
         response = self.structured_model.invoke(message)
-
         return response.model_dump()
-
-
-
