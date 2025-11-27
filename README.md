@@ -17,7 +17,7 @@ Adhaar/
 │   │   aadhaar.py      # OCR extraction logic using LangChain + OpenAI
 │   │   details.py      # Pydantic model for structured Aadhaar details
 │   │   __init__.py
-│   └───__pycache__
+│   └───__pycache__w
 │
 └───__pycache__
 ```

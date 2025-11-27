@@ -54,7 +54,7 @@ class AadhaarExtractor:
 
                             IMPORTANT INSTRUCTIONS:
                             - Extract ONLY information that is clearly visible and readable
-                            - Use "null" for any field that is not visible or unclear
+                            - If a field is not visible, return the JSON value null (do not write the string "null")
                             - Ensure the Aadhaar number is exactly 12 digits
                             - Maintain exact spelling and formatting as shown on the card
                             - For address, include all visible components in proper sequence
